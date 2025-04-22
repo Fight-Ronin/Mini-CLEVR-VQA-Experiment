@@ -57,9 +57,13 @@ python baseline_clip_lora.py ^
 └── env_clip.yml                     # env for CLIP + LoRA baseline
 
 # Dataset Format
-{"image": "train/img_00001.png",
- "question": "What colour is the pentagon?",
- "answer": "yellow"}
+Each *.jsonl line contains::
+  {
+    "image": "images/train/000001.png",
+    "question": "What color is the sphere?",
+    "answer": "red",
+    "type": "property"
+  }
 
 
 

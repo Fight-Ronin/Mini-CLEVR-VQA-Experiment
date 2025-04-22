@@ -1,7 +1,7 @@
 """
 Mini‑CLEVR Dataset Generator
 ===========================
-Generates a synthetic VQA dataset of simple 2‑D "CLEVR‑like" scenes with
+Generates a synthetic VQA dataset of simple 2-D "CLEVR-like" scenes with
 multiple colored shapes.  For each image it automatically creates a set of
 questions (property / counting / spatial‑relation) together with answers,
 compatible with common VQA loaders.
@@ -29,7 +29,7 @@ Each *.jsonl line contains::
     "type": "property"
   }
 ---------------------------------------------------------------------------
-The script is **stand‑alone** (depends only on Pillow & NumPy) and avoids
+The script is **stand-alone** (depends only on Pillow & NumPy) and avoids
 object overlap to keep questions valid.
 """
 
@@ -64,8 +64,7 @@ def parse_args():
     p.add_argument("--val_ratio", type=float, default=0.1)
     return p.parse_args()
 
-# GEOMETRY UTILS 
-
+# GEOMETRY UTILS.
 def overlaps(cx: int, cy: int, r: int, others: List[Tuple[int, int, int]]) -> bool:
     """Return True if circle (cx,cy,r) overlaps any in *others* (list of (x,y,r))."""
     for ox, oy, orad in others:
@@ -75,7 +74,6 @@ def overlaps(cx: int, cy: int, r: int, others: List[Tuple[int, int, int]]) -> bo
     return False
 
 # DRAW PRIMITIVES
-
 def draw_shape(draw: ImageDraw.ImageDraw, shape: str, cx: int, cy: int, rad: int, color: Tuple[int, int, int]):
     if shape == "circle":
         bbox = [cx - rad, cy - rad, cx + rad, cy + rad]
@@ -99,8 +97,7 @@ def draw_shape(draw: ImageDraw.ImageDraw, shape: str, cx: int, cy: int, rad: int
     else:
         raise ValueError(f"Unknown shape {shape}")
 
-# QUESTION TEXT GENERATION #
-
+# QUESTION TEXT GENERATION
 def make_property_q(obj):
     q = f"What color is the {obj['shape']}?"
     return {"question": q, "answer": obj["color"], "type": "property"}
@@ -118,8 +115,7 @@ def make_relation_q(o1, o2):
     ans = "yes" if horiz == "left" else "no"
     return {"question": q, "answer": ans, "type": "relation"}
 
-# MAIN GENERATION
-
+# MAIN
 def generate_dataset(args):
     random.seed(42)
     np.random.seed(42)

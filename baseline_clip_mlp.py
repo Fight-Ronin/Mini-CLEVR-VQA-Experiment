@@ -16,7 +16,7 @@ import wandb
 from peft import get_peft_model, LoraConfig
 
 warnings.filterwarnings("ignore", category=FutureWarning,
-        message="Importing from timm.models.layers")   # 静默 timm 提示
+        message="Importing from timm.models.layers")
 
 # ---------------------------- Dataset ------------------------------------ #
 class JsonlClipDataset(Dataset):
@@ -131,7 +131,7 @@ def main():
         if acc>best:
             best=acc; torch.save(model.state_dict(),ckpt)
             art=wandb.Artifact("clip-lora-best",type="model"); art.add_file(str(ckpt)); run.log_artifact(art)
-    print("✅ done. best",best); run.finish()
+    print(" done. best", best); run.finish()
 
 if __name__=="__main__":
     main()

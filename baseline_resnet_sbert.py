@@ -38,10 +38,10 @@ class ResNetSBERT(nn.Module):
         if unfreeze_layer4:
             for n,p in self.resnet.named_parameters():
                 if n.startswith("layer4"): p.requires_grad = True
-        # text encoder (全冻结)
+        # text encoder
         self.sbert = SentenceTransformer("all-mpnet-base-v2", device=device)
         self.sbert.requires_grad_(False)
-        # projection txt 768→512
+        # projection txt
         self.txt_proj = nn.Linear(768, 512, bias=False)
 
         feat_dim = 512 + 768 + (512 if fusion!="cat" else 0) + (512 if fusion=="cat_mix_diff" else 0)
@@ -105,7 +105,7 @@ def main():
     a2i=json.load(open(a.data_dir/'answer2idx.json'))
     tfms=transforms.Compose([
         transforms.Resize((224,224)),
-        transforms.ColorJitter(0.1,0.1,0.1,0.05),   # 轻量增强
+        transforms.ColorJitter(0.1,0.1,0.1,0.05),
         transforms.ToTensor(),
         transforms.Normalize([0.485,0.456,0.406],[0.229,0.224,0.225]),
     ])
@@ -122,7 +122,7 @@ def main():
     opt=torch.optim.AdamW([
         {"params": cls_p,  "lr": 1e-3},
         {"params": proj_p, "lr": 1e-3},
-        {"params": other_p,"lr": 1e-4}   # layer4 (若解冻)
+        {"params": other_p,"lr": 1e-4}   # layer4 (if unfreeze)
     ], weight_decay=5e-3)
     sched=WarmCos(opt,len(tr_ld)*2,len(tr_ld)*a.epochs,1e-3)
 
@@ -144,7 +144,7 @@ def main():
         if acc>best:
             best=acc; torch.save(model.state_dict(),ckpt)
             art=wandb.Artifact("best-model",type="model"); art.add_file(str(ckpt)); run.log_artifact(art)
-    print("✅ done. best val_acc",best); run.finish()
+    print("done. best val_acc",best); run.finish()
 
 if __name__=="__main__":
     main()
