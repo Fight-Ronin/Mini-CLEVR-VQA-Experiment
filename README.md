@@ -8,6 +8,11 @@ dataset I generated for the lab take‑home project.
 | **clip‑lora‑auto** | ViT‑B/32 (CLIP) + LoRA *r = 8* | CLIP B/32 text | `cat ⊕ mix ⊕ |diff|` | **≈ 1 M** | 0.87 | **0.91** |
 | **v2‑mix‑diff‑layer4** | ResNet‑18 (*layer4 optional*) | SBERT (all‑mpnet‑base‑v2) | `cat ⊕ mix ⊕ |diff|` | 2 M | 0.80 | **0.84** |
 
+
+* Overall mini_clevt Dataset used in this project can be found via this link: https://drive.google.com/file/d/149G5wTmhQuERf8pPIQX6wyoY2feLH34j/view?usp=sharing. The uploaded pictures in the repo was just some sample demonstrations.
+
+* The best trained checkpoints (parameters) for both baseline can be found via this link: https://drive.google.com/file/d/149G5wTmhQuERf8pPIQX6wyoY2feLH34j/view?usp=sharing
+
 ---
 
 ## Quick Start
@@ -56,6 +61,7 @@ python baseline_clip_lora.py ^
 {"image": "train/img_00001.png",
  "question": "What colour is the pentagon?",
  "answer": "yellow"}
+
 
 
 
