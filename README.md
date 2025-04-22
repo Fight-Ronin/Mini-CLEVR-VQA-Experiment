@@ -1,7 +1,7 @@
 # Mini‑CLEVR VQA – Baseline Experiments
 
 This repo contains **two lightweight baselines** for the synthetic Mini‑CLEVR
-dataset I generated for the lab take‑home project.
+dataset I generated. A detailed experiment report is included under the ./report folder for more detail information and analysis.
 
 | Tag | Vision encoder | Text encoder | Fusion formula | Trainable params | 10 ep Val Acc | 15 ep Val Acc |
 |-----|----------------|--------------|----------------|------------------|---------------|---------------|
@@ -19,8 +19,8 @@ dataset I generated for the lab take‑home project.
 
 ```bash
 # 1) create & activate env (see *.yml at bottom)
-conda env create -f env_mini-clevr.yml
-conda activate mini-clevr
+conda env create -f env_mini-clevr.yml / env_clip.yml
+conda activate mini-clevr / mini-clevr-clip
 
 # 2) dataset already generated under ./mini_clevr
 
@@ -53,7 +53,6 @@ python baseline_clip_lora.py ^
 ├── data_gen/                        # Mini‑CLEVR image + JSONL generator
 ├── mini_clevr/                      # train/val images & *.jsonl & answer2idx.json
 ├── report/                          # project report (PDF / PPTX)
-├── checkpoints/                     # saved *.pt weights
 ├── env_mini-clevr.yml               # env for dataset + ResNet‑SBERT baselines
 └── env_clip.yml                     # env for CLIP + LoRA baseline
 

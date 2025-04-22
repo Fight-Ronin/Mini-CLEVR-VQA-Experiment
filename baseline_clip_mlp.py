@@ -1,6 +1,5 @@
 """
 Baseline-2: CLIP ViT-B/32 + LoRA (on last two Attention.proj & MLP)
-================================================================
 """
 
 import argparse, json, math, random, warnings
