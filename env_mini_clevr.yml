@@ -1,0 +1,24 @@
+name: mini-clevr
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pytorch=2.2
+  - torchvision=0.17
+  - torchaudio=2.2
+  - pytorch-cuda=12.1
+  - numpy=1.26
+  - scikit-learn
+  - pandas
+  - tqdm
+  - pillow
+  - pip
+  - pip:
+      # multimodal libs
+      - open_clip_torch==2.24.0
+      - sentence-transformers==2.6.1
+      - peft==0.10.0
+      # logging
+      - wandb==0.16.3

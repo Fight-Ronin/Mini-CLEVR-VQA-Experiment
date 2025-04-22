@@ -1,0 +1,21 @@
+name: mini-clevr-clip
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pytorch=2.2
+  - torchvision
+  - torchaudio
+  - pytorch-cuda=12.1      # 关键行
+  - numpy=1.26
+  - scikit-learn
+  - pandas
+  - tqdm
+  - pillow
+  - pip
+  - pip:
+      - open_clip_torch==2.24.0
+      - sentence-transformers==2.6.1
+      - wandb==0.16.3
