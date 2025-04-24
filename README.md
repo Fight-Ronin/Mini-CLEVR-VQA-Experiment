@@ -25,14 +25,14 @@ conda activate mini-clevr / mini-clevr-clip
 # 2) dataset already generated under ./mini_clevr
 
 # 3‑A) ResNet‑SBERT baseline (15 epochs, layer4 frozen)
-python baseline_resnet_sbert_v2.py ^
+python baseline_resnet_sbert.py ^
   --data_dir ./mini_clevr ^
   --batch 128 --epochs 15 ^
   --fusion cat_mix_diff ^
   --wandb_run r18-sbert
 
 # 3‑B) ResNet‑SBERT (+layer4 fine‑tune, lr 1e‑4)
-python baseline_resnet_sbert_v2.py ^
+python baseline_resnet_sbert.py ^
   --data_dir ./mini_clevr ^
   --batch 128 --epochs 15 ^
   --fusion cat_mix_diff ^
@@ -48,7 +48,7 @@ python baseline_clip_lora.py ^
 
 # File Tree
 .
-├── baseline_resnet_sbert_v2.py      # ResNet‑18 + SBERT baseline
+├── baseline_resnet_sbert.py      # ResNet‑18 + SBERT baseline
 ├── baseline_clip_lora.py            # ViT‑B/32 + LoRA baseline
 ├── data_gen/                        # Mini‑CLEVR image + JSONL generator
 ├── mini_clevr/                      # train/val images & *.jsonl & answer2idx.json
