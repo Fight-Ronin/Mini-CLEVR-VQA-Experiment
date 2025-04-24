@@ -1,7 +1,6 @@
 """
-Baseline-2: CLIP ViT-B/32 + LoRA (on last two Attention.proj & MLP)
+Baseline‑2: CLIP ViT‑B/32 + LoRA  (last‑2 blocks Linear layers)
 """
-
 import argparse, json, math, random, warnings
 from pathlib import Path
 
@@ -10,7 +9,7 @@ from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 from PIL import Image
 import open_clip
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, f1_score
 from tqdm.auto import tqdm
 import wandb
 from peft import get_peft_model, LoraConfig
@@ -28,7 +27,7 @@ class JsonlClipDataset(Dataset):
         r = self.recs[i]
         img = self.tfms(Image.open(self.img_root / r["image"]).convert("RGB"))
         txt = self.tok([r["question"]])[0]
-        return img, txt, self.a2i[r["answer"]]
+        return img, txt, self.a2i[r["answer"]], r["type"]
 
 # ---------------------------- Model -------------------------------------- #
 class ClipLoRAMLP(nn.Module):
@@ -54,15 +53,25 @@ class ClipLoRAMLP(nn.Module):
 
 # ----------------------- Eval ------------------------------------------- #
 @torch.no_grad()
-def evaluate(m,loader,dev):
-    m.eval(); P,G=[],[]
-    for im,tx,y in loader:
-        P.extend(m(im.to(dev),tx.to(dev)).argmax(1).cpu().tolist()); G.extend(y.tolist())
-    return accuracy_score(G,P)
+def evaluate(model, loader, device):
+    model.eval(); P,G,T=[],[],[]
+    for im,tx,y,t in loader:
+        P.extend(model(im.to(device),tx.to(device)).argmax(1).cpu())
+        G.extend(y); T.extend(t)
+    acc = accuracy_score(G,P)
+    f1_macro = f1_score(G,P,average="macro")
+    type_f1={}
+    for typ in {"property","count","relation"}:
+        idx=[i for i,x in enumerate(T) if x==typ]
+        if idx:
+            y_sub=[G[j] for j in idx]; p_sub=[P[j] for j in idx]
+            type_f1[typ]=f1_score(y_sub,p_sub,average="macro")
+    return acc, f1_macro, type_f1
 
 # ----------------------- Warmup‑Cosine ---------------------------------- #
 class WarmupCos:
-    def __init__(self,opt,warm,total,base): self.o,self.w,self.tot,self.b=opt,warm,total,base; self.s=0
+    def __init__(self,opt,warm,total,base):
+        self.o,self.w,self.tot,self.b=opt,warm,total,base; self.s=0
     def step(self):
         self.s+=1
         lr=self.b*self.s/self.w if self.s<=self.w else 0.5*self.b*(1+math.cos(math.pi*(self.s-self.w)/(self.tot-self.w)))
@@ -78,7 +87,8 @@ def parse():
     p.add_argument("--lr",type=float,default=1e-3)
     p.add_argument("--fusion",choices=["cat","cat_mix","cat_mix_diff"],default="cat_mix_diff")
     p.add_argument("--device",default="cuda" if torch.cuda.is_available() else "cpu")
-    p.add_argument("--wandb_project",default="mini-clevr"); p.add_argument("--wandb_run",default=None)
+    p.add_argument("--wandb_project",default="mini-clevr")
+    p.add_argument("--wandb_run",default=None)
     return p.parse_args()
 
 def main():
@@ -88,13 +98,11 @@ def main():
     tok = open_clip.get_tokenizer("ViT-B-32")
 
     # --- auto‑detect Linear names in last 2 blocks ---
-    lin_names=[]
+    target_modules=set()
     for n,m in clip.named_modules():
         if isinstance(m, nn.Linear) and (".10." in n or ".11." in n):
-            lin_names.append(n.split('.')[-1])   # take leaf name like proj / c_fc / c_proj
-    target_modules=list(set(lin_names))          # unique
-
-    lora_cfg=LoraConfig(r=8,lora_alpha=32,target_modules=target_modules)
+            target_modules.add(n.split('.')[-1])   # proj / c_fc / c_proj
+    lora_cfg=LoraConfig(r=8,lora_alpha=32,target_modules=list(target_modules))
     clip=get_peft_model(clip,lora_cfg).eval()
 
     # --- data ---
@@ -118,20 +126,24 @@ def main():
     best=0; step=0; ckpt=Path("checkpoints/clip_lora_best.pt"); ckpt.parent.mkdir(exist_ok=True)
     for ep in range(1,a.epochs+1):
         model.train(); ep_loss=0
-        for im,tx,y in tqdm(tr_ld,desc=f"Ep{ep}"):
+        for im,tx,y,_ in tqdm(tr_ld,desc=f"Ep{ep}"):
             im,tx,y=im.to(a.device),tx.to(a.device),y.to(a.device)
-            opt.zero_grad(); loss=nn.functional.cross_entropy(model(im,tx),y,label_smoothing=0.1)
+            opt.zero_grad()
+            loss=nn.functional.cross_entropy(model(im,tx),y,label_smoothing=0.1)
             loss.backward(); sched.step()
             ep_loss+=loss.item()*im.size(0); step+=1
             wandb.log({"train_loss_step":loss.item()},step=step)
         ep_loss/=len(tr)
-        acc=evaluate(model,va_ld,a.device)
-        wandb.log({"train_loss_epoch":ep_loss,"val_acc":acc,"epoch":ep})
-        print(f"Ep{ep}: loss={ep_loss:.4f}  val={acc:.4f}")
+        acc,f1_macro,f1_type=evaluate(model,va_ld,a.device)
+        log={"train_loss_epoch":ep_loss,"val_acc":acc,"val_f1":f1_macro,"epoch":ep}
+        log.update({f"val_f1_{k}":v for k,v in f1_type.items()})
+        wandb.log(log)
+        print(f"Ep{ep}: loss={ep_loss:.4f}  acc={acc:.4f}  f1={f1_macro:.4f}")
         if acc>best:
             best=acc; torch.save(model.state_dict(),ckpt)
-            art=wandb.Artifact("clip-lora-best",type="model"); art.add_file(str(ckpt)); run.log_artifact(art)
-    print(" done. best", best); run.finish()
+            art=wandb.Artifact("clip-lora-best",type="model")
+            art.add_file(str(ckpt)); run.log_artifact(art)
+    print("✅ done. best", best); run.finish()
 
 if __name__=="__main__":
     main()

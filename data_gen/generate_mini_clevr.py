@@ -110,9 +110,15 @@ def make_count_q(color, objects):
 
 
 def make_relation_q(o1, o2):
-    horiz = "left" if o1["cx"] < o2["cx"] - REL_MARGIN else "right"
-    q = f"Is the {o1['color']} {o1['shape']} to the {horiz} of the {o2['color']} {o2['shape']}?"
-    ans = "yes" if horiz == "left" else "no"
+    # Ask either 'left of' or 'right of' with 50 % probability.
+    ask_left = random.choice([True, False])      
+    rel_word = "left" if ask_left else "right"
+
+    q = f"Is the {o1['color']} {o1['shape']} to the {rel_word} " \
+        f"of the {o2['color']} {o2['shape']}?"
+
+    cond_left = o1["cx"] < o2["cx"] - REL_MARGIN
+    ans = "yes" if (cond_left and ask_left) or (not cond_left and not ask_left) else "no"
     return {"question": q, "answer": ans, "type": "relation"}
 
 # MAIN
