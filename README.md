@@ -1,7 +1,7 @@
 # Mini‑CLEVR VQA – Baseline Experiments
 
 This repo contains **two lightweight baselines** for the synthetic Mini‑CLEVR
-dataset I generated. A detailed experiment report is included under the ./report folder for more detail information and analysis.
+dataset I generated. A detailed experiment report is included under the ./report folder for more comprehensive information and analysis.
 
 | Tag | Vision encoder | Text encoder | Fusion formula | Trainable params | 10 ep Val Acc | 15 ep Val Acc |
 |-----|----------------|--------------|----------------|------------------|---------------|---------------|
