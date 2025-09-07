@@ -5,7 +5,7 @@ dataset I generated. A detailed experiment report is included under the ./report
 
 | Tag | Vision encoder | Text encoder | Fusion formula | Trainable params | 10 ep Val Acc | 15 ep Val Acc |
 |-----|----------------|--------------|----------------|------------------|---------------|---------------|
-| **clip‑lora‑auto** | ViT‑B/32 (CLIP) + LoRA *r = 8* | CLIP B/32 text | `cat ⊕ mix ⊕ |diff|` | **≈ 1 M** | 0.87 | **0.91** |
+| **clip‑lora‑auto** | ViT‑B/32 (CLIP) + LoRA (r = 8) | CLIP B/32 text | `cat ⊕ mix ⊕ |diff|` | **≈ 1 M** | 0.87 | **0.91** |
 | **v2‑mix‑diff‑layer4** | ResNet‑18 (*layer4 optional*) | SBERT (all‑mpnet‑base‑v2) | `cat ⊕ mix ⊕ |diff|` | 2 M | 0.80 | **0.84** |
 
 
@@ -64,8 +64,4 @@ Each *.jsonl line contains::
     "answer": "red",
     "type": "property"
   }
-
-
-
-
 
