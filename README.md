@@ -5,8 +5,8 @@ dataset I generated. A detailed experiment report is included under the ./report
 
 | Tag | Vision encoder | Text encoder | Fusion formula | Trainable params | 10 ep Val Acc | 15 ep Val Acc |
 |-----|----------------|--------------|----------------|------------------|---------------|---------------|
-| **clip‑lora‑auto** | ViT‑B/32 (CLIP) + LoRA (r = 8) | CLIP B/32 text | `cat ⊕ mix ⊕ |diff|` | **≈ 1 M** | 0.87 | **0.91** |
-| **v2‑mix‑diff‑layer4** | ResNet‑18 (*layer4 optional*) | SBERT (all‑mpnet‑base‑v2) | `cat ⊕ mix ⊕ |diff|` | 2 M | 0.80 | **0.84** |
+| **clip‑lora‑auto** | ViT‑B/32 (CLIP) + LoRA (r = 8) | CLIP B/32 text | `cat ⊕ mix ⊕ \|diff\|` | **≈ 1 M** | 0.87 | **0.91** |
+| **v2‑mix‑diff‑layer4** | ResNet‑18 (*layer4 optional*) | SBERT (all‑mpnet‑base‑v2) | `cat ⊕ mix ⊕ \|diff\|` | 2 M | 0.80 | **0.84** |
 
 
 * Overall mini_clevt Dataset used in this project can be found via this link: https://drive.google.com/file/d/149G5wTmhQuERf8pPIQX6wyoY2feLH34j/view?usp=sharing. The uploaded pictures in the repo was just some sample demonstrations.
