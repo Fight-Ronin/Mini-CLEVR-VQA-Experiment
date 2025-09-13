@@ -1,9 +1,9 @@
 """
-Mini‑CLEVR Dataset Generator
+Mini-CLEVR Dataset Generator
 ===========================
 Generates a synthetic VQA dataset of simple 2-D "CLEVR-like" scenes with
 multiple colored shapes.  For each image it automatically creates a set of
-questions (property / counting / spatial‑relation) together with answers,
+questions (property / counting / spatial-relation) together with answers,
 compatible with common VQA loaders.
 
 Usage (from CLI) -----------------------------------------------------------

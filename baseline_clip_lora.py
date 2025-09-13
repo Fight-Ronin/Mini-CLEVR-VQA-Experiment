@@ -143,7 +143,7 @@ def main():
             best=acc; torch.save(model.state_dict(),ckpt)
             art=wandb.Artifact("clip-lora-best",type="model")
             art.add_file(str(ckpt)); run.log_artifact(art)
-    print("✅ done. best", best); run.finish()
+    print("done. best", best); run.finish()
 
 if __name__=="__main__":
     main()
